@@ -85,7 +85,7 @@ class CreateTableWindow(QtWidgets.QMainWindow):
         name = self.ui.tableNameE.text()
         d = self.ui.textEditE.toPlainText()
         print(d,name)
-        tabledict = dict(d)
+        tabledict = dict(eval(d))
         print(tabledict)
         self.parent().db.createTable(table=name,structure=tabledict)
 
@@ -95,7 +95,7 @@ def main():
     window = Main()
     window.show()
     sys.exit(app.exec_())
-    
+
 
 if __name__ == '__main__':
     main()
