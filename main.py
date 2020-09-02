@@ -2,7 +2,7 @@ import sys, os
 from PyQt5 import QtWidgets,QtGui,QtCore
 from database.database import DB
 
-import Ui_main, Ui_new_table
+from mypyUI import Ui_main, Ui_new_table
 
 class Main(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
