@@ -2,7 +2,7 @@ import sys, os
 from PyQt5 import QtWidgets,QtGui,QtCore
 from database.database import DB
 
-from mypyUI import Ui_main, Ui_new_table,Ui_linePlCombo
+from mypyUI import Ui_main, Ui_new_table,Ui_linePlCombo, Ui_new_write
 
 class Main(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
@@ -62,7 +62,7 @@ class Main(QtWidgets.QMainWindow):
             row += 1
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.itemChanged.connect(self.editcell)
-
+        
     def editcell(self,item:QtWidgets.QTableWidgetItem):
         col = self.db.getcolumns()[item.column()]
         row = item.row() + 1
