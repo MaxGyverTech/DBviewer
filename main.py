@@ -19,7 +19,7 @@ class Main(QtWidgets.QMainWindow):
         self.ui.openAc.triggered.connect(self.browsefile)
         self.ui.newTabAc.triggered.connect(self.create_table)
         self.ui.comboBox.currentTextChanged.connect(self.tableselected)
-        
+
     def setActive(self,val:bool = False):
         s = self.ui
         s.addWriteAc.setEnabled(val)
@@ -36,6 +36,7 @@ class Main(QtWidgets.QMainWindow):
         self.updateCombo()
 
     def updateCombo(self):
+        self.ui.comboBox.clear()
         tables = self.db.gettables()
         for i in tables:
             self.ui.comboBox.addItem(i[0])
@@ -87,6 +88,7 @@ class CreateTableWindow(QtWidgets.QMainWindow):
 # ''')
 
         self.ui.createBtn.clicked.connect(self.createTB)
+        self.ui.delWriteBtn.clicked.connect(self.delpole)
 
     def createTB(self):
         name = self.ui.tableNameE.text()
@@ -105,6 +107,17 @@ class CreateTableWindow(QtWidgets.QMainWindow):
     def newpole(self):
         self.pole = CastLineCombo(self,txt1='Название столбца',txt2='Тип данных',itemstxt=self.parent().datatypes,varname='crDict')
         self.pole.show()
+    def delpole(self):
+        arr = []
+        print(self.crDict)
+        for i in self.crDict:
+            arr.append(i)
+        print(arr)
+        item, ok = QtWidgets.QInputDialog.getItem(self, 'Удалить поле','Выберите запись для удаления',arr)
+        if ok and item:
+            del self.crDict[item]
+            self.updlist()
+            
 
 class CastLineCombo(QtWidgets.QMainWindow):
     def __init__(self,parent=None,txt1='Введите',txt2='выбирете',itemstxt=[],varname=''):
