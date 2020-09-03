@@ -2,7 +2,7 @@ import sys, os
 from PyQt5 import QtWidgets,QtGui,QtCore
 from database.database import DB
 
-from mypyUI import Ui_main, Ui_new_table
+from mypyUI import Ui_main, Ui_new_table,Ui_linePlCombo
 
 class Main(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
@@ -13,6 +13,8 @@ class Main(QtWidgets.QMainWindow):
         self.setWindowTitle('DB view by MGT')
         self.setWindowIcon(QtGui.QIcon('icon.ico'))
         self.setActive()
+        # vars
+        self.datatypes = ['TEXT','INT','NUMERIC','REAL','NONE']
         #trigers
         self.ui.openAc.triggered.connect(self.browsefile)
         self.ui.newTabAc.triggered.connect(self.create_table)
@@ -74,21 +76,52 @@ class CreateTableWindow(QtWidgets.QMainWindow):
         super(CreateTableWindow,self).__init__(parent)
         self.ui = Ui_new_table.Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.newWriteBtn.clicked.connect(self.newpole)
+        self.ui.cansBtn.clicked.connect(self.close)
         self.setWindowTitle('Создать таблицу')
-        self.ui.textEditE.setPlainText(
-            '''name1 = 'INT',\nname2 = 'TEXT'
-''')
+        self.crDict = {}
+#         self.ui.textEditE.setPlainText(
+#             '''name1 = 'INT',\nname2 = 'TEXT'
+# ''')
 
         self.ui.createBtn.clicked.connect(self.createTB)
 
     def createTB(self):
-        name = self.ui.tableNameE.text()
-        d = self.ui.textEditE.toPlainText()
-        print(d,name)
-        tabledict = dict(eval(d))
-        print(tabledict)
-        self.parent().db.createTable(table=name,structure=tabledict)
+        # name = self.ui.tableNameE.text()
+        # d = self.ui.textEditE.toPlainText()
+        # print(d,name)
+        # tabledict = dict(eval(d))
+        # print(tabledict)
+        # self.parent().db.createTable(table=name,structure=tabledict)
+        pass
+    def updlist(self):
+        self.items = []
+        for i in self.crDict:
+            # self.items.append(QtWidgets.QListWidgetItem())
+            t = str(i) + '  ' + self.crDict[i]
+            self.ui.listWidget.addItem(t)
+    def newpole(self):
+        self.pole = CastLineCombo(self,txt1='Название столбца',txt2='Тип данных',itemstxt=self.parent().datatypes,varname='crDict')
+        self.pole.show()
 
+class CastLineCombo(QtWidgets.QMainWindow):
+    def __init__(self,parent=None,txt1='Введите',txt2='выбирете',itemstxt=[],varname=''):
+        super(CastLineCombo,self).__init__(parent)
+        self.ui = Ui_linePlCombo.Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.var = varname
+        # UI
+        self.ui.txt1.setText(txt1)
+        self.ui.txt2.setText(txt2)
+        self.ui.comboBox.addItems(itemstxt)
+        # bind
+        self.ui.cansBtn.clicked.connect(self.close)
+        self.ui.confBtn.clicked.connect(self.add)
+    def add(self):
+        if self.ui.edittxt.text != '':
+            eval(f'self.parent().{self.var}')[self.ui.edittxt.text()] = self.ui.comboBox.currentText()
+            self.parent().updlist()
+            self.close()
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
