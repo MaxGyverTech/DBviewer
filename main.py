@@ -19,7 +19,7 @@ class Main(QtWidgets.QMainWindow):
         self.ui.openAc.triggered.connect(self.browsefile)
         self.ui.newTabAc.triggered.connect(self.create_table)
         self.ui.comboBox.currentTextChanged.connect(self.tableselected)
-    
+        
     def setActive(self,val:bool = False):
         s = self.ui
         s.addWriteAc.setEnabled(val)
@@ -32,9 +32,11 @@ class Main(QtWidgets.QMainWindow):
         db = DB(file,debug=True)
         print(file)
         self.db = db
-        tables = db.gettables()
-        print(tables)
         self.setActive(True)
+        self.updateCombo()
+
+    def updateCombo(self):
+        tables = self.db.gettables()
         for i in tables:
             self.ui.comboBox.addItem(i[0])
     
@@ -87,14 +89,14 @@ class CreateTableWindow(QtWidgets.QMainWindow):
         self.ui.createBtn.clicked.connect(self.createTB)
 
     def createTB(self):
-        # name = self.ui.tableNameE.text()
-        # d = self.ui.textEditE.toPlainText()
-        # print(d,name)
-        # tabledict = dict(eval(d))
-        # print(tabledict)
-        # self.parent().db.createTable(table=name,structure=tabledict)
-        pass
+        name = self.ui.tableNameE.text()
+        print(self.crDict)
+        self.parent().db.createTable(table=name,structure=self.crDict)
+        self.parent().updateCombo()
+        self.close()
+
     def updlist(self):
+        self.ui.listWidget.clear()
         self.items = []
         for i in self.crDict:
             # self.items.append(QtWidgets.QListWidgetItem())
