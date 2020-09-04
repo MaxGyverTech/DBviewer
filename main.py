@@ -18,6 +18,9 @@ class Main(QtWidgets.QMainWindow):
         #trigers
         self.ui.openAc.triggered.connect(self.browsefile)
         self.ui.newTabAc.triggered.connect(self.create_table)
+        self.ui.addWriteAc.triggered.connect(self.new_write)
+        self.ui.delWriteAc.triggered.connect(self.del_write)
+        self.ui.delTabAc.triggered.connect(self.del_table)
         self.ui.comboBox.currentTextChanged.connect(self.tableselected)
 
     def setActive(self,val:bool = False):
@@ -45,7 +48,6 @@ class Main(QtWidgets.QMainWindow):
         self.ui.statusbar.showMessage('Можете редактировать ячейки они сразу сохранятся',msecs=10000)
         self.db.setdefaulttable(value)
         columns = self.db.getcolumns()
-        print(columns)
         self.ui.tableWidget.setColumnCount(len(columns))
         self.ui.tableWidget.setHorizontalHeaderLabels(columns)
         data = self.db.getall()
@@ -73,7 +75,30 @@ class Main(QtWidgets.QMainWindow):
     def create_table(self):
         self.createTb = CreateTableWindow(self)
         self.createTb.show()
-
+    def new_write(self):
+        self.newWr = NewWrite(self)
+        self.newWr.show()
+        # 
+    def del_write(self):
+        arr = []
+        for x in self.db.gettables():
+            for i in self.db.getall(self.db.getcolumns()[0],table=x):
+                arr.append(i[0])
+        print(arr)
+        item, ok = QtWidgets.QInputDialog.getItem(self, 'Удалить таблицу','Выберите таблицу для удаления',arr)
+        if ok and item:
+            self.db.del_teable(table=item)
+            self.db.setdefaulttable(self.db.gettables()[0])
+            self.updateCombo()
+    def del_table(self):
+        arr = []
+        for x in self.db.gettables():
+            arr.append(x[0])
+        print(arr)
+        item, ok = QtWidgets.QInputDialog.getItem(self, 'Удалить таблицу','Выберите таблицу для удаления',arr)
+        if ok and item:
+            self.db.del_teable(table=item)
+            self.updateCombo()
 class CreateTableWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
         super(CreateTableWindow,self).__init__(parent)
@@ -137,6 +162,29 @@ class CastLineCombo(QtWidgets.QMainWindow):
             eval(f'self.parent().{self.var}')[self.ui.edittxt.text()] = self.ui.comboBox.currentText()
             self.parent().updlist()
             self.close()
+
+class NewWrite(QtWidgets.QMainWindow):
+    def __init__(self,parent=None,txt1='Введите',txt2='выбирете',itemstxt=[],varname=''):
+        super(NewWrite,self).__init__(parent)
+        self.ui = Ui_new_write.Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.setWindowTitle('Новая запись')
+
+        self.ui.cansBtn.clicked.connect(self.close)
+        self.ui.okBtn.clicked.connect(self.add)
+
+        self.columns = self.parent().db.getcolumns()
+        self.ui.tableWidget.setColumnCount(len(self.columns))
+        self.ui.tableWidget.setHorizontalHeaderLabels(self.columns)
+        self.ui.tableWidget.setRowCount(1)
+    def add(self):
+        items = []
+        for i in range(len(self.columns)):
+            a = items.append(self.ui.tableWidget.item(1,i))
+            print(a)
+        print(items)
+        self.parent.db.write(items)
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
